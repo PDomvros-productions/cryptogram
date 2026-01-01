@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptogram Master Pro</title>
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --bg: #eef2f5;
+            --box-bg: #2c3e50;
+            --text-color: #333;
+            --success: #27ae60;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* --- Header & Logo --- */
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: var(--box-bg);
+            font-size: 1.8rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .title-logo {
+            height: 50px;
+            width: auto;
+            margin-right: 15px;
+            vertical-align: middle;
+        }
+        
+        .title-logo[src=""] { display: none; }
+
+        /* --- Main Layout --- */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        /* --- Quote Section --- */
+        #quote-area {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            max-width: 900px;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .word-group {
+            display: flex;
+            gap: 3px;
+            margin-bottom: 10px;
+        }
+
+        /* --- Clues Section --- */
+        #clues-area {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            width: 100%;
+            max-width: 1000px;
+            margin-bottom: 30px;
+        }
+
+        .clue-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .clue-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            padding-right: 5px;
+        }
+
+        .clue-icon { font-size: 1.5rem; }
+        .clue-text { font-weight: 600; font-size: 0.9rem; color: #444; }
+        .clue-inputs { display: flex; gap: 3px; }
+
+        /* --- Input Box Styling --- */
+        .letter-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        input.letter-box {
+            width: 28px; height: 34px;
+            text-align: center; font-size: 1.1rem; font-weight: bold;
+            text-transform: uppercase;
+            border: 2px solid #cbd5e0; border-radius: 5px;
+            background-color: #f8fafc; color: var(--box-bg);
+            transition: all 0.2s; padding: 0;
+        }
+        
+        /* Specific style for spaces/punctuation in quotes */
+        .punctuation-box {
+             width: 28px; height: 34px;
+             display: flex; justify-content: center; align-items: flex-end;
+             font-size: 1.5rem; font-weight: bold; color: var(--box-bg);
+             padding-bottom: 5px;
+        }
+
+        input.letter-box:focus {
+            outline: none; border-color: var(--primary);
+            background-color: white; transform: translateY(-2px);
+            z-index: 10;
+        }
+
+        input.letter-box.highlight { background-color: #dbeafe; border-color: #93c5fd; }
+        input.letter-box.correct { background-color: var(--primary); color: white; border-color: var(--primary); }
+
+        .letter-number {
+            font-size: 0.6rem; font-weight: bold; color: #7f8c8d; margin-top: 2px;
+        }
+
+        /* --- Footer --- */
+        footer {
+            margin-top: auto;
+            padding: 20px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--box-bg);
+            background: white;
+            width: 100%;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            border-radius: 15px 15px 0 0;
+        }
+
+        /* --- Modals --- */
+        #win-modal {
+            display: none; position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); background: white;
+            padding: 30px; border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            text-align: center; z-index: 100;
+            max-width: 90%;
+        }
+        
+        #win-modal h2 { margin: 0 0 10px 0; color: var(--success); }
+        #win-modal p { margin-bottom: 20px; color: #555; }
+        
+        #next-btn {
+            background: var(--primary); color: white; border: none;
+            padding: 12px 24px; border-radius: 30px;
+            cursor: pointer; font-size: 1rem; font-weight: bold;
+            transition: background 0.2s;
+        }
+        #next-btn:hover { background: #357abd; }
+
+        #overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 99;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <h1>
+            <img src="logo.png" alt="Logo" class="title-logo" onerror="this.style.display='none'">
+            Cryptogram Challenge
+        </h1>
+    </div>
+
+    <main>
+        <div id="quote-area"></div>
+        <div id="clues-area"></div>
+    </main>
+
+    <footer>
+        ✨✍️ Created by Panagiotis Domvros, English and Drama Teacher ✍️✨
+    </footer>
+
+    <div id="overlay"></div>
+    <div id="win-modal">
+        <h2>🎉 Solved!</h2>
+        <p>The message was:<br><strong id="final-msg"></strong></p>
+        <button id="next-btn">Next Random Puzzle ▶</button>
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. THE DATA
+        // ==========================================
+        
+        // The Bank of Quotes (Mix of Standard & Hard)
+        const quoteBank = [
+            "BE HAPPY FOR THIS MOMENT",
+            "TO BE OR NOT TO BE",
+            "ALL THE WORLDS A STAGE",
+            "KNOWLEDGE IS POWER",
+            "THE PLAY IS THE THING",
+            "BREAK A LEG",
+            "ACTIONS SPEAK LOUDER THAN WORDS",
+            "CARPE DIEM",
+            "WHATS DONE IS DONE",
+            "THE SHOW MUST GO ON",
+            "ADVERSITY INTRODUCES A MAN TO HIMSELF",
+            "IMAGINATION IS MORE IMPORTANT THAN KNOWLEDGE",
+            "THE UNEXAMINED LIFE IS NOT WORTH LIVING",
+            "HAPPINESS DEPENDS UPON OURSELVES",
+            "OPPORTUNITY DOES NOT KNOCK IT PRESENTS ITSELF",
+            "DO NOT GO GENTLE INTO THAT GOOD NIGHT",
+            "SUCCESS COMES TO THOSE WHO ARE TOO BUSY TO LOOK",
+            "IN THE MIDDLE OF DIFFICULTY LIES OPPORTUNITY",
+            "BELIEVE YOU CAN AND YOU ARE HALFWAY THERE",
+            "CHANGE YOUR THOUGHTS AND YOU CHANGE YOUR WORLD"
+        ];
+
+        // The Master Dictionary of Clues (Mostly 5 letters)
+        // Used to construct the puzzle dynamically.
+        const clueDictionary = [
+            { w: "ABOUT", h: "Regarding", i: "ℹ️" },
+            { w: "ABOVE", h: "Over head", i: "⬆️" },
+            { w: "ACTOR", h: "Movie star", i: "🎭" },
+            { w: "ADULT", h: "Grown up", i: "🧑" },
+            { w: "ALBUM", h: "Music collection", i: "💿" },
+            { w: "ALPHA", h: "First letter", i: "Α" },
+            { w: "APPLE", h: "Red fruit", i: "🍎" },
+            { w: "AWARD", h: "Prize", i: "🏆" },
+            { w: "BAKER", h: "Bread maker", i: "🥖" },
+            { w: "BEACH", h: "Sand and sea", i: "🏖️" },
+            { w: "BIRTH", h: "Beginning of life", i: "👶" },
+            { w: "BLACK", h: "Dark color", i: "⬛" },
+            { w: "BRAIN", h: "Thinking organ", i: "🧠" },
+            { w: "BREAD", h: "Sandwich base", i: "🥪" },
+            { w: "BROWN", h: "Color of wood", i: "🟤" },
+            { w: "BRUSH", h: "Paint tool", i: "🖌️" },
+            { w: "CHAIR", h: "Sit on it", i: "🪑" },
+            { w: "CHEST", h: "Torso", i: "👕" },
+            { w: "CHILD", h: "Young human", i: "🧒" },
+            { w: "CLASS", h: "School room", i: "🏫" },
+            { w: "CLOCK", h: "Tells time", i: "⏰" },
+            { w: "CLOUD", h: "In the sky", i: "☁️" },
+            { w: "DANCE", h: "Move to music", i: "💃" },
+            { w: "DEATH", h: "End of life", i: "💀" },
+            { w: "DREAM", h: "Sleep thought", i: "💭" },
+            { w: "DRINK", h: "Water or juice", i: "🥤" },
+            { w: "DRIVE", h: "Operate car", i: "🚗" },
+            { w: "EARTH", h: "Our planet", i: "🌍" },
+            { w: "EMPTY", h: "Not full", i: "🈳" },
+            { w: "ENTER", h: "Go inside", i: "🚪" },
+            { w: "FIELD", h: "Open land", i: "🏞️" },
+            { w: "FRUIT", h: "Food type", i: "🍇" },
+            { w: "GHOST", h: "Spooky spirit", i: "👻" },
+            { w: "GLASS", h: "Window material", i: "🪟" },
+            { w: "GRASS", h: "Green lawn", i: "🌱" },
+            { w: "GREEN", h: "Color of grass", i: "🟢" },
+            { w: "HEART", h: "Pumps blood", i: "❤️" },
+            { w: "HEAVY", h: "Not light", i: "⚖️" },
+            { w: "HORSE", h: "Ride animal", i: "🐎" },
+            { w: "HOTEL", h: "Travel stay", i: "🏨" },
+            { w: "HOUSE", h: "Home", i: "🏠" },
+            { w: "IMAGE", h: "Picture", i: "🖼️" },
+            { w: "JUICE", h: "Fruit drink", i: "🧃" },
+            { w: "KNIFE", h: "Cut tool", i: "🔪" },
+            { w: "LARGE", h: "Big", i: "🐘" },
+            { w: "LAUGH", h: "Haha", i: "😂" },
+            { w: "LIGHT", h: "Not dark", i: "💡" },
+            { w: "LUNCH", h: "Midday meal", i: "🍱" },
+            { w: "MAGIC", h: "Tricks", i: "🎩" },
+            { w: "METAL", h: "Steel or iron", i: "🔩" },
+            { w: "MONEY", h: "Cash", i: "💵" },
+            { w: "MONTH", h: "April or May", i: "📅" },
+            { w: "MOUTH", h: "Speak with", i: "👄" },
+            { w: "MUSIC", h: "Songs", i: "🎵" },
+            { w: "NIGHT", h: "Not day", i: "🌙" },
+            { w: "NORTH", h: "Compass point", i: "⬆️" },
+            { w: "OCEAN", h: "Big sea", i: "🌊" },
+            { w: "ORDER", h: "Sequence", i: "1️⃣" },
+            { w: "PAPER", h: "Write on", i: "📄" },
+            { w: "PARTY", h: "Celebration", i: "🎉" },
+            { w: "PHONE", h: "Call device", i: "📱" },
+            { w: "PHOTO", h: "Camera shot", i: "📷" },
+            { w: "PIANO", h: "Keys instrument", i: "🎹" },
+            { w: "PILOT", h: "Flies plane", i: "👨‍✈️" },
+            { w: "PIZZA", h: "Italian food", i: "🍕" },
+            { w: "PLANE", h: "Flying machine", i: "✈️" },
+            { w: "PLANT", h: "Vegetation", i: "🌿" },
+            { w: "PLATE", h: "Eat off it", i: "🍽️" },
+            { w: "POWER", h: "Energy", i: "🔋" },
+            { w: "PRICE", h: "Cost", i: "🏷️" },
+            { w: "QUEEN", h: "Royal woman", i: "👸" },
+            { w: "QUIET", h: "No noise", i: "🤫" },
+            { w: "RADIO", h: "Audio broadcast", i: "📻" },
+            { w: "RIVER", h: "Flowing water", i: "🏞️" },
+            { w: "ROBOT", h: "Machine man", i: "🤖" },
+            { w: "ROUND", h: "Circle shape", i: "⭕" },
+            { w: "SCALE", h: "Weighing tool", i: "⚖️" },
+            { w: "SHIRT", h: "Top clothing", i: "👕" },
+            { w: "SHOES", h: "Footwear", i: "👟" },
+            { w: "SHORT", h: "Not tall", i: "🤏" },
+            { w: "SLEEP", h: "Rest at night", i: "💤" },
+            { w: "SMALL", h: "Little", i: "🐜" },
+            { w: "SMILE", h: "Happy face", i: "😊" },
+            { w: "SNAKE", h: "Legless reptile", i: "🐍" },
+            { w: "SOUTH", h: "Compass point", i: "⬇️" },
+            { w: "SPACE", h: "Stars area", i: "🌌" },
+            { w: "SPOON", h: "Soup tool", i: "🥄" },
+            { w: "STORM", h: "Rain and wind", i: "⛈️" },
+            { w: "SUGAR", h: "Sweet powder", i: "🍬" },
+            { w: "TABLE", h: "Furniture", i: "┬─┬" },
+            { w: "TASTE", h: "Sense flavor", i: "👅" },
+            { w: "TEETH", h: "Bite with", i: "🦷" },
+            { w: "THING", h: "Object", i: "📦" },
+            { w: "TIGER", h: "Striped cat", i: "🐅" },
+            { w: "TOUCH", h: "Feel with hand", i: "👆" },
+            { w: "TRACK", h: "Path", i: "🛤️" },
+            { w: "TRAIN", h: "Rail vehicle", i: "🚆" },
+            { w: "TRUCK", h: "Big car", i: "🚚" },
+            { w: "UNCLE", h: "Dad's brother", i: "👨" },
+            { w: "UNDER", h: "Below", i: "👇" },
+            { w: "VALUE", h: "Worth", i: "💎" },
+            { w: "VIDEO", h: "Moving picture", i: "📹" },
+            { w: "VOICE", h: "Speak sound", i: "🗣️" },
+            { w: "WATCH", h: "Wrist clock", i: "⌚" },
+            { w: "WATER", h: "Drink this", i: "💧" },
+            { w: "WHITE", h: "Snow color", i: "⚪" },
+            { w: "WOMAN", h: "Lady", i: "👩" },
+            { w: "WORLD", h: "The globe", i: "🌎" },
+            { w: "WRITE", h: "Use pen", i: "✍️" },
+            { w: "ZEBRA", h: "Striped horse", i: "🦓" }
+        ];
+
+        // ==========================================
+        // 2. GAME LOGIC
+        // ==========================================
+
+        let currentQuote = "";
+        let activeMapping = {};
+        let availableQuotes = [];
+
+        // Generate Random Mapping (A=1, B=23, etc)
+        function generateMapping(quoteText) {
+            const map = {};
+            const usedNumbers = new Set();
+            // Get all unique letters in quote
+            const uniqueChars = [...new Set(quoteText.toUpperCase().split(''))].filter(c => c.match(/[A-Z]/));
+
+            uniqueChars.forEach(char => {
+                let num;
+                do {
+                    num = Math.floor(Math.random() * 26) + 1;
+                } while (usedNumbers.has(num));
+                
+                usedNumbers.add(num);
+                map[char] = num;
+            });
+            return map;
+        }
+
+        // SMART CLUE GENERATOR
+        // This ensures EVERY letter in the quote appears in the clues
+        function generateSmartClues(quoteText) {
+            // 1. Identify all unique letters needed
+            let neededChars = new Set([...quoteText.toUpperCase().split('')].filter(c => c.match(/[A-Z]/)));
+            let selectedClues = [];
+            let safetyCounter = 0;
+
+            // 2. Loop until all letters are covered
+            while (neededChars.size > 0 && safetyCounter < 100) {
+                let bestWordObj = null;
+                let maxNewCoverage = 0;
+
+                // Find the word in dictionary that covers the MOST missing letters
+                // shuffle dictionary slightly to get random results for ties
+                const shuffledDict = clueDictionary.sort(() => 0.5 - Math.random());
+
+                for (let item of shuffledDict) {
+                    // Skip if already selected
+                    if (selectedClues.includes(item)) continue;
+
+                    // Count how many NEEDED chars this word covers
+                    let coverCount = 0;
+                    for (let char of item.w) {
+                        if (neededChars.has(char)) {
+                            coverCount++;
+                        }
+                    }
+
+                    // Prioritize words that cover the most NEW letters
+                    if (coverCount > maxNewCoverage) {
+                        maxNewCoverage = coverCount;
+                        bestWordObj = item;
+                    }
+                }
+
+                // If we found a useful word, add it
+                if (bestWordObj) {
+                    selectedClues.push(bestWordObj);
+                    // Remove covered letters from needed Set
+                    for (let char of bestWordObj.w) {
+                        neededChars.delete(char);
+                    }
+                } else {
+                    // Fallback: If dictionary doesn't have the letter (rare like Z or Q sometimes)
+                    // We just break to avoid infinite loop. 
+                    // (With current dictionary, coverage is 99.9% guaranteed)
+                    break;
+                }
+                safetyCounter++;
+            }
+
+            // 3. Ensure mapping covers these new words too
+            // The mapping generator needs to run AFTER we know all words (Quote + Clues)
+            // But currently we generate mapping strictly based on Quote.
+            // Actually, we just need to extend the mapping for letters in Clues that ARENT in Quote.
+            
+            return selectedClues;
+        }
+
+        function extendMappingForClues(map, clueList) {
+            const usedNumbers = new Set(Object.values(map));
+            
+            clueList.forEach(clue => {
+                for (let char of clue.w) {
+                    if (!map[char]) {
+                        // Assign a number if not already mapped
+                        let num;
+                        do {
+                            num = Math.floor(Math.random() * 26) + 1;
+                        } while (usedNumbers.has(num));
+                        usedNumbers.add(num);
+                        map[char] = num;
+                    }
+                }
+            });
+            return map;
+        }
+
+        // ==========================================
+        // 3. UI RENDERING
+        // ==========================================
+
+        const quoteArea = document.getElementById('quote-area');
+        const cluesArea = document.getElementById('clues-area');
+        const overlay = document.getElementById('overlay');
+        const winModal = document.getElementById('win-modal');
+        const finalMsg = document.getElementById('final-msg');
+
+        function createLetterBox(char, isClueSection = false) {
+            const container = document.createElement('div');
+            container.className = 'letter-container';
+            const upperChar = char.toUpperCase();
+
+            if (activeMapping[upperChar]) {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.maxLength = 1;
+                input.className = 'letter-box';
+                
+                const num = activeMapping[upperChar];
+                const numberLabel = document.createElement('span');
+                numberLabel.className = 'letter-number';
+                numberLabel.innerText = num;
+
+                input.dataset.number = num;
+                input.dataset.answer = upperChar;
+                
+                input.addEventListener('input', (e) => handleInput(e, num));
+                input.addEventListener('focus', () => highlightGroup(num, true));
+                input.addEventListener('blur', () => highlightGroup(num, false));
+                input.addEventListener('keyup', (e) => {
+                     if(e.key.length === 1 && e.key.match(/[a-z]/i)) {
+                         let next = container.nextElementSibling; 
+                         if(next && next.querySelector('input')) {
+                             next.querySelector('input').focus();
+                         }
+                     }
+                });
+
+                container.appendChild(input);
+                container.appendChild(numberLabel);
+            } else if (!upperChar.match(/[A-Z]/) && upperChar !== ' ') {
+                if(!isClueSection) {
+                    const punct = document.createElement('div');
+                    punct.className = 'punctuation-box';
+                    punct.innerText = upperChar;
+                    return punct;
+                }
+            } else if (upperChar === ' ') {
+                return null; 
+            }
+            return container;
+        }
+
+        function loadRandomPuzzle() {
+            // UI Reset
+            quoteArea.innerHTML = '';
+            cluesArea.innerHTML = '';
+            overlay.style.display = 'none';
+            winModal.style.display = 'none';
+
+            // Pick Quote
+            if (availableQuotes.length === 0) {
+                availableQuotes = [...quoteBank];
+            }
+            const randIndex = Math.floor(Math.random() * availableQuotes.length);
+            currentQuote = availableQuotes[randIndex];
+            availableQuotes.splice(randIndex, 1); // Remove used
+
+            // 1. Generate Clues based on logic
+            const generatedClues = generateSmartClues(currentQuote);
+
+            // 2. Generate Mapping for Quote
+            activeMapping = generateMapping(currentQuote);
+            
+            // 3. Extend Mapping to cover letters in Clues that weren't in Quote
+            activeMapping = extendMappingForClues(activeMapping, generatedClues);
+
+            // Render Quote
+            const words = currentQuote.split(' ');
+            words.forEach(word => {
+                const wordGroup = document.createElement('div');
+                wordGroup.className = 'word-group';
+                for (let char of word) {
+                    const box = createLetterBox(char);
+                    if(box) wordGroup.appendChild(box);
+                }
+                quoteArea.appendChild(wordGroup);
+            });
+
+            // Render Clues
+            generatedClues.forEach(clue => {
+                const row = document.createElement('div');
+                row.className = 'clue-row';
+                
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'clue-info';
+                infoDiv.innerHTML = `<div class="clue-icon">${clue.i}</div><div class="clue-text">${clue.h}</div>`;
+
+                const inputsDiv = document.createElement('div');
+                inputsDiv.className = 'clue-inputs';
+                for (let char of clue.w) {
+                    const box = createLetterBox(char, true);
+                    if(box) inputsDiv.appendChild(box);
+                }
+
+                row.appendChild(infoDiv);
+                row.appendChild(inputsDiv);
+                cluesArea.appendChild(row);
+            });
+        }
+
+        function handleInput(e, numberId) {
+            const val = e.target.value.toUpperCase();
+            document.querySelectorAll(`input[data-number="${numberId}"]`).forEach(inp => {
+                inp.value = val;
+            });
+            checkWin();
+        }
+
+        function highlightGroup(numberId, isActive) {
+            document.querySelectorAll(`input[data-number="${numberId}"]`).forEach(inp => {
+                inp.classList.toggle('highlight', isActive);
+            });
+        }
+
+        function checkWin() {
+            // Only check boxes in the Quote Area to determine win
+            const quoteInputs = quoteArea.querySelectorAll('input.letter-box');
+            let isFull = true; 
+            let isCorrect = true;
+
+            quoteInputs.forEach(input => {
+                if (!input.value) isFull = false;
+                if (input.value.toUpperCase() !== input.dataset.answer) isCorrect = false;
+            });
+
+            if (isFull && isCorrect) {
+                document.querySelectorAll('input.letter-box').forEach(i => i.classList.add('correct'));
+                finalMsg.innerText = currentQuote;
+                setTimeout(() => {
+                    overlay.style.display = 'block';
+                    winModal.style.display = 'block';
+                }, 500);
+            }
+        }
+
+        document.getElementById('next-btn').addEventListener('click', loadRandomPuzzle);
+
+        // Init
+        loadRandomPuzzle();
+
+    </script>
+</body>
+</html>
