@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cryptogram Master Pro</title>
+    <title>Literary & Movie Cryptograms</title>
     <style>
         :root {
             --primary: #4a90e2;
@@ -39,6 +39,7 @@
             margin: 0;
             display: flex;
             align-items: center;
+            text-align: center;
         }
 
         .title-logo {
@@ -194,7 +195,7 @@
     <div class="header-container">
         <h1>
             <img src="logo.png" alt="Logo" class="title-logo" onerror="this.style.display='none'">
-            Cryptogram Challenge
+            Literary & Movie Cryptograms
         </h1>
     </div>
 
@@ -210,152 +211,85 @@
     <div id="overlay"></div>
     <div id="win-modal">
         <h2>🎉 Solved!</h2>
-        <p>The message was:<br><strong id="final-msg"></strong></p>
+        <p>The quote was:<br><strong id="final-msg"></strong></p>
         <button id="next-btn">Next Random Puzzle ▶</button>
     </div>
 
     <script>
         // ==========================================
-        // 1. THE DATA
+        // 1. THE DATA: Famous Quotes
         // ==========================================
         
-        // The Bank of Quotes (Mix of Standard & Hard)
         const quoteBank = [
-            "BE HAPPY FOR THIS MOMENT",
-            "TO BE OR NOT TO BE",
-            "ALL THE WORLDS A STAGE",
-            "KNOWLEDGE IS POWER",
-            "THE PLAY IS THE THING",
-            "BREAK A LEG",
-            "ACTIONS SPEAK LOUDER THAN WORDS",
-            "CARPE DIEM",
-            "WHATS DONE IS DONE",
-            "THE SHOW MUST GO ON",
-            "ADVERSITY INTRODUCES A MAN TO HIMSELF",
-            "IMAGINATION IS MORE IMPORTANT THAN KNOWLEDGE",
-            "THE UNEXAMINED LIFE IS NOT WORTH LIVING",
-            "HAPPINESS DEPENDS UPON OURSELVES",
-            "OPPORTUNITY DOES NOT KNOCK IT PRESENTS ITSELF",
-            "DO NOT GO GENTLE INTO THAT GOOD NIGHT",
-            "SUCCESS COMES TO THOSE WHO ARE TOO BUSY TO LOOK",
-            "IN THE MIDDLE OF DIFFICULTY LIES OPPORTUNITY",
-            "BELIEVE YOU CAN AND YOU ARE HALFWAY THERE",
-            "CHANGE YOUR THOUGHTS AND YOU CHANGE YOUR WORLD"
+            "TO BE OR NOT TO BE THAT IS THE QUESTION", // 1. Shakespeare (Hamlet)
+            "I CAME I SAW I CONQUERED", // 2. Julius Caesar
+            "A TALE OF TWO CITIES", // 3. Dickens Title
+            "IT WAS THE BEST OF TIMES IT WAS THE WORST OF TIMES", // 4. Dickens (A Tale of Two Cities)
+            "ROMEO ROMEO WHEREFORE ART THOU ROMEO", // 5. Shakespeare (Romeo & Juliet)
+            "SHALL I COMPARE THEE TO A SUMMER'S DAY", // 6. Shakespeare (Sonnet 18)
+            "THE ONLY THING WE HAVE TO FEAR IS FEAR ITSELF", // 7. FDR
+            "ASK NOT WHAT YOUR COUNTRY CAN DO FOR YOU", // 8. JFK
+            "I HAVE A DREAM", // 9. MLK Jr.
+            "MAY THE FORCE BE WITH YOU", // 10. Star Wars
+            "THERE'S NO PLACE LIKE HOME", // 11. The Wizard of Oz
+            "FOUR SCORE AND SEVEN YEARS AGO", // 12. Lincoln (Gettysburg Address)
+            "THE UNEXAMINED LIFE IS NOT WORTH LIVING", // 13. Socrates
+            "I THINK THEREFORE I AM", // 14. Descartes
+            "KNOWLEDGE IS POWER", // 15. Francis Bacon
+            "YOU CAN'T HANDLE THE TRUTH", // 16. A Few Good Men
+            "THAT'S ONE SMALL STEP FOR MAN", // 17. Neil Armstrong
+            "CALL ME ISHMAEL", // 18. Melville (Moby Dick)
+            "ALL ANIMALS ARE EQUAL BUT SOME ARE MORE EQUAL THAN OTHERS", // 19. Orwell (Animal Farm)
+            "BIG BROTHER IS WATCHING YOU", // 20. Orwell (1984)
+            "IT IS A TRUTH UNIVERSALLY ACKNOWLEDGED", // 21. Austen (Pride and Prejudice)
+            "FRANKLY MY DEAR I DON'T GIVE A DAMN", // 22. Gone with the Wind
+            "HERE'S LOOKING AT YOU KID", // 23. Casablanca
+            "ELEMENTARY MY DEAR WATSON", // 24. Sherlock Holmes (attributed)
+            "A ROSE BY ANY OTHER NAME WOULD SMELL AS SWEET", // 25. Shakespeare (Romeo & Juliet)
+            "I SOLEMNLY SWEAR THAT I AM UP TO NO GOOD", // 26. Harry Potter
+            "COME WITH ME IF YOU WANT TO LIVE", // 27. Terminator
+            "SING MY ANGEL OF MUSIC" // 28. Phantom of the Opera
         ];
 
         // The Master Dictionary of Clues (Mostly 5 letters)
-        // Used to construct the puzzle dynamically.
         const clueDictionary = [
-            { w: "ABOUT", h: "Regarding", i: "ℹ️" },
-            { w: "ABOVE", h: "Over head", i: "⬆️" },
-            { w: "ACTOR", h: "Movie star", i: "🎭" },
-            { w: "ADULT", h: "Grown up", i: "🧑" },
-            { w: "ALBUM", h: "Music collection", i: "💿" },
-            { w: "ALPHA", h: "First letter", i: "Α" },
-            { w: "APPLE", h: "Red fruit", i: "🍎" },
-            { w: "AWARD", h: "Prize", i: "🏆" },
-            { w: "BAKER", h: "Bread maker", i: "🥖" },
-            { w: "BEACH", h: "Sand and sea", i: "🏖️" },
-            { w: "BIRTH", h: "Beginning of life", i: "👶" },
-            { w: "BLACK", h: "Dark color", i: "⬛" },
-            { w: "BRAIN", h: "Thinking organ", i: "🧠" },
-            { w: "BREAD", h: "Sandwich base", i: "🥪" },
-            { w: "BROWN", h: "Color of wood", i: "🟤" },
-            { w: "BRUSH", h: "Paint tool", i: "🖌️" },
-            { w: "CHAIR", h: "Sit on it", i: "🪑" },
-            { w: "CHEST", h: "Torso", i: "👕" },
-            { w: "CHILD", h: "Young human", i: "🧒" },
-            { w: "CLASS", h: "School room", i: "🏫" },
-            { w: "CLOCK", h: "Tells time", i: "⏰" },
-            { w: "CLOUD", h: "In the sky", i: "☁️" },
-            { w: "DANCE", h: "Move to music", i: "💃" },
-            { w: "DEATH", h: "End of life", i: "💀" },
-            { w: "DREAM", h: "Sleep thought", i: "💭" },
-            { w: "DRINK", h: "Water or juice", i: "🥤" },
-            { w: "DRIVE", h: "Operate car", i: "🚗" },
-            { w: "EARTH", h: "Our planet", i: "🌍" },
-            { w: "EMPTY", h: "Not full", i: "🈳" },
-            { w: "ENTER", h: "Go inside", i: "🚪" },
-            { w: "FIELD", h: "Open land", i: "🏞️" },
-            { w: "FRUIT", h: "Food type", i: "🍇" },
-            { w: "GHOST", h: "Spooky spirit", i: "👻" },
-            { w: "GLASS", h: "Window material", i: "🪟" },
-            { w: "GRASS", h: "Green lawn", i: "🌱" },
-            { w: "GREEN", h: "Color of grass", i: "🟢" },
-            { w: "HEART", h: "Pumps blood", i: "❤️" },
-            { w: "HEAVY", h: "Not light", i: "⚖️" },
-            { w: "HORSE", h: "Ride animal", i: "🐎" },
-            { w: "HOTEL", h: "Travel stay", i: "🏨" },
-            { w: "HOUSE", h: "Home", i: "🏠" },
-            { w: "IMAGE", h: "Picture", i: "🖼️" },
-            { w: "JUICE", h: "Fruit drink", i: "🧃" },
-            { w: "KNIFE", h: "Cut tool", i: "🔪" },
-            { w: "LARGE", h: "Big", i: "🐘" },
-            { w: "LAUGH", h: "Haha", i: "😂" },
-            { w: "LIGHT", h: "Not dark", i: "💡" },
-            { w: "LUNCH", h: "Midday meal", i: "🍱" },
-            { w: "MAGIC", h: "Tricks", i: "🎩" },
-            { w: "METAL", h: "Steel or iron", i: "🔩" },
-            { w: "MONEY", h: "Cash", i: "💵" },
-            { w: "MONTH", h: "April or May", i: "📅" },
-            { w: "MOUTH", h: "Speak with", i: "👄" },
-            { w: "MUSIC", h: "Songs", i: "🎵" },
-            { w: "NIGHT", h: "Not day", i: "🌙" },
-            { w: "NORTH", h: "Compass point", i: "⬆️" },
-            { w: "OCEAN", h: "Big sea", i: "🌊" },
-            { w: "ORDER", h: "Sequence", i: "1️⃣" },
-            { w: "PAPER", h: "Write on", i: "📄" },
-            { w: "PARTY", h: "Celebration", i: "🎉" },
-            { w: "PHONE", h: "Call device", i: "📱" },
-            { w: "PHOTO", h: "Camera shot", i: "📷" },
-            { w: "PIANO", h: "Keys instrument", i: "🎹" },
-            { w: "PILOT", h: "Flies plane", i: "👨‍✈️" },
-            { w: "PIZZA", h: "Italian food", i: "🍕" },
-            { w: "PLANE", h: "Flying machine", i: "✈️" },
-            { w: "PLANT", h: "Vegetation", i: "🌿" },
-            { w: "PLATE", h: "Eat off it", i: "🍽️" },
-            { w: "POWER", h: "Energy", i: "🔋" },
-            { w: "PRICE", h: "Cost", i: "🏷️" },
-            { w: "QUEEN", h: "Royal woman", i: "👸" },
-            { w: "QUIET", h: "No noise", i: "🤫" },
-            { w: "RADIO", h: "Audio broadcast", i: "📻" },
-            { w: "RIVER", h: "Flowing water", i: "🏞️" },
-            { w: "ROBOT", h: "Machine man", i: "🤖" },
-            { w: "ROUND", h: "Circle shape", i: "⭕" },
-            { w: "SCALE", h: "Weighing tool", i: "⚖️" },
-            { w: "SHIRT", h: "Top clothing", i: "👕" },
-            { w: "SHOES", h: "Footwear", i: "👟" },
-            { w: "SHORT", h: "Not tall", i: "🤏" },
-            { w: "SLEEP", h: "Rest at night", i: "💤" },
-            { w: "SMALL", h: "Little", i: "🐜" },
-            { w: "SMILE", h: "Happy face", i: "😊" },
-            { w: "SNAKE", h: "Legless reptile", i: "🐍" },
-            { w: "SOUTH", h: "Compass point", i: "⬇️" },
-            { w: "SPACE", h: "Stars area", i: "🌌" },
-            { w: "SPOON", h: "Soup tool", i: "🥄" },
-            { w: "STORM", h: "Rain and wind", i: "⛈️" },
-            { w: "SUGAR", h: "Sweet powder", i: "🍬" },
-            { w: "TABLE", h: "Furniture", i: "┬─┬" },
-            { w: "TASTE", h: "Sense flavor", i: "👅" },
-            { w: "TEETH", h: "Bite with", i: "🦷" },
-            { w: "THING", h: "Object", i: "📦" },
-            { w: "TIGER", h: "Striped cat", i: "🐅" },
-            { w: "TOUCH", h: "Feel with hand", i: "👆" },
-            { w: "TRACK", h: "Path", i: "🛤️" },
-            { w: "TRAIN", h: "Rail vehicle", i: "🚆" },
-            { w: "TRUCK", h: "Big car", i: "🚚" },
-            { w: "UNCLE", h: "Dad's brother", i: "👨" },
-            { w: "UNDER", h: "Below", i: "👇" },
-            { w: "VALUE", h: "Worth", i: "💎" },
-            { w: "VIDEO", h: "Moving picture", i: "📹" },
-            { w: "VOICE", h: "Speak sound", i: "🗣️" },
-            { w: "WATCH", h: "Wrist clock", i: "⌚" },
-            { w: "WATER", h: "Drink this", i: "💧" },
-            { w: "WHITE", h: "Snow color", i: "⚪" },
-            { w: "WOMAN", h: "Lady", i: "👩" },
-            { w: "WORLD", h: "The globe", i: "🌎" },
-            { w: "WRITE", h: "Use pen", i: "✍️" },
-            { w: "ZEBRA", h: "Striped horse", i: "🦓" }
+            { w: "ABOUT", h: "Regarding", i: "ℹ️" }, { w: "ABOVE", h: "Over head", i: "⬆️" }, { w: "ACTOR", h: "Movie star", i: "🎭" },
+            { w: "ADULT", h: "Grown up", i: "🧑" }, { w: "ALBUM", h: "Music collection", i: "💿" }, { w: "ALPHA", h: "First letter", i: "Α" },
+            { w: "APPLE", h: "Red fruit", i: "🍎" }, { w: "AWARD", h: "Prize", i: "🏆" }, { w: "BAKER", h: "Bread maker", i: "🥖" },
+            { w: "BEACH", h: "Sand and sea", i: "🏖️" }, { w: "BIRTH", h: "Beginning of life", i: "👶" }, { w: "BLACK", h: "Dark color", i: "⬛" },
+            { w: "BRAIN", h: "Thinking organ", i: "🧠" }, { w: "BREAD", h: "Sandwich base", i: "🥪" }, { w: "BROWN", h: "Color of wood", i: "🟤" },
+            { w: "BRUSH", h: "Paint tool", i: "🖌️" }, { w: "CHAIR", h: "Sit on it", i: "🪑" }, { w: "CHEST", h: "Torso", i: "👕" },
+            { w: "CHILD", h: "Young human", i: "🧒" }, { w: "CLASS", h: "School room", i: "🏫" }, { w: "CLOCK", h: "Tells time", i: "⏰" },
+            { w: "CLOUD", h: "In the sky", i: "☁️" }, { w: "DANCE", h: "Move to music", i: "💃" }, { w: "DEATH", h: "End of life", i: "💀" },
+            { w: "DREAM", h: "Sleep thought", i: "💭" }, { w: "DRINK", h: "Water or juice", i: "🥤" }, { w: "DRIVE", h: "Operate car", i: "🚗" },
+            { w: "EARTH", h: "Our planet", i: "🌍" }, { w: "EMPTY", h: "Not full", i: "🈳" }, { w: "ENTER", h: "Go inside", i: "🚪" },
+            { w: "FIELD", h: "Open land", i: "🏞️" }, { w: "FRUIT", h: "Food type", i: "🍇" }, { w: "GHOST", h: "Spooky spirit", i: "👻" },
+            { w: "GLASS", h: "Window material", i: "🪟" }, { w: "GRASS", h: "Green lawn", i: "🌱" }, { w: "GREEN", h: "Color of grass", i: "🟢" },
+            { w: "HEART", h: "Pumps blood", i: "❤️" }, { w: "HEAVY", h: "Not light", i: "⚖️" }, { w: "HORSE", h: "Ride animal", i: "🐎" },
+            { w: "HOTEL", h: "Travel stay", i: "🏨" }, { w: "HOUSE", h: "Home", i: "🏠" }, { w: "IMAGE", h: "Picture", i: "🖼️" },
+            { w: "JUICE", h: "Fruit drink", i: "🧃" }, { w: "KNIFE", h: "Cut tool", i: "🔪" }, { w: "LARGE", h: "Big", i: "🐘" },
+            { w: "LAUGH", h: "Haha", i: "😂" }, { w: "LIGHT", h: "Not dark", i: "💡" }, { w: "LUNCH", h: "Midday meal", i: "🍱" },
+            { w: "MAGIC", h: "Tricks", i: "🎩" }, { w: "METAL", h: "Steel or iron", i: "🔩" }, { w: "MONEY", h: "Cash", i: "💵" },
+            { w: "MONTH", h: "April or May", i: "📅" }, { w: "MOUTH", h: "Speak with", i: "👄" }, { w: "MUSIC", h: "Songs", i: "🎵" },
+            { w: "NIGHT", h: "Not day", i: "🌙" }, { w: "NORTH", h: "Compass point", i: "⬆️" }, { w: "OCEAN", h: "Big sea", i: "🌊" },
+            { w: "ORDER", h: "Sequence", i: "1️⃣" }, { w: "PAPER", h: "Write on", i: "📄" }, { w: "PARTY", h: "Celebration", i: "🎉" },
+            { w: "PHONE", h: "Call device", i: "📱" }, { w: "PHOTO", h: "Camera shot", i: "📷" }, { w: "PIANO", h: "Keys instrument", i: "🎹" },
+            { w: "PILOT", h: "Flies plane", i: "👨‍✈️" }, { w: "PIZZA", h: "Italian food", i: "🍕" }, { w: "PLANE", h: "Flying machine", i: "✈️" },
+            { w: "PLANT", h: "Vegetation", i: "🌿" }, { w: "PLATE", h: "Eat off it", i: "🍽️" }, { w: "POWER", h: "Energy", i: "🔋" },
+            { w: "PRICE", h: "Cost", i: "🏷️" }, { w: "QUEEN", h: "Royal woman", i: "👸" }, { w: "QUIET", h: "No noise", i: "🤫" },
+            { w: "RADIO", h: "Audio broadcast", i: "📻" }, { w: "RIVER", h: "Flowing water", i: "🏞️" }, { w: "ROBOT", h: "Machine man", i: "🤖" },
+            { w: "ROUND", h: "Circle shape", i: "⭕" }, { w: "SCALE", h: "Weighing tool", i: "⚖️" }, { w: "SHIRT", h: "Top clothing", i: "👕" },
+            { w: "SHOES", h: "Footwear", i: "👟" }, { w: "SHORT", h: "Not tall", i: "🤏" }, { w: "SLEEP", h: "Rest at night", i: "💤" },
+            { w: "SMALL", h: "Little", i: "🐜" }, { w: "SMILE", h: "Happy face", i: "😊" }, { w: "SNAKE", h: "Legless reptile", i: "🐍" },
+            { w: "SOUTH", h: "Compass point", i: "⬇️" }, { w: "SPACE", h: "Stars area", i: "🌌" }, { w: "SPOON", h: "Soup tool", i: "🥄" },
+            { w: "STORM", h: "Rain and wind", i: "⛈️" }, { w: "SUGAR", h: "Sweet powder", i: "🍬" }, { w: "TABLE", h: "Furniture", i: "┬─┬" },
+            { w: "TASTE", h: "Sense flavor", i: "👅" }, { w: "TEETH", h: "Bite with", i: "🦷" }, { w: "THING", h: "Object", i: "📦" },
+            { w: "TIGER", h: "Striped cat", i: "🐅" }, { w: "TOUCH", h: "Feel with hand", i: "👆" }, { w: "TRACK", h: "Path", i: "🛤️" },
+            { w: "TRAIN", h: "Rail vehicle", i: "🚆" }, { w: "TRUCK", h: "Big car", i: "🚚" }, { w: "UNCLE", h: "Dad's brother", i: "👨" },
+            { w: "UNDER", h: "Below", i: "👇" }, { w: "VALUE", h: "Worth", i: "💎" }, { w: "VIDEO", h: "Moving picture", i: "📹" },
+            { w: "VOICE", h: "Speak sound", i: "🗣️" }, { w: "WATCH", h: "Wrist clock", i: "⌚" }, { w: "WATER", h: "Drink this", i: "💧" },
+            { w: "WHITE", h: "Snow color", i: "⚪" }, { w: "WOMAN", h: "Lady", i: "👩" }, { w: "WORLD", h: "The globe", i: "🌎" },
+            { w: "WRITE", h: "Use pen", i: "✍️" }, { w: "ZEBRA", h: "Striped horse", i: "🦓" }
         ];
 
         // ==========================================
@@ -370,7 +304,6 @@
         function generateMapping(quoteText) {
             const map = {};
             const usedNumbers = new Set();
-            // Get all unique letters in quote
             const uniqueChars = [...new Set(quoteText.toUpperCase().split(''))].filter(c => c.match(/[A-Z]/));
 
             uniqueChars.forEach(char => {
@@ -386,72 +319,46 @@
         }
 
         // SMART CLUE GENERATOR
-        // This ensures EVERY letter in the quote appears in the clues
         function generateSmartClues(quoteText) {
-            // 1. Identify all unique letters needed
             let neededChars = new Set([...quoteText.toUpperCase().split('')].filter(c => c.match(/[A-Z]/)));
             let selectedClues = [];
             let safetyCounter = 0;
 
-            // 2. Loop until all letters are covered
             while (neededChars.size > 0 && safetyCounter < 100) {
                 let bestWordObj = null;
                 let maxNewCoverage = 0;
-
-                // Find the word in dictionary that covers the MOST missing letters
-                // shuffle dictionary slightly to get random results for ties
                 const shuffledDict = clueDictionary.sort(() => 0.5 - Math.random());
 
                 for (let item of shuffledDict) {
-                    // Skip if already selected
                     if (selectedClues.includes(item)) continue;
 
-                    // Count how many NEEDED chars this word covers
                     let coverCount = 0;
                     for (let char of item.w) {
-                        if (neededChars.has(char)) {
-                            coverCount++;
-                        }
+                        if (neededChars.has(char)) coverCount++;
                     }
 
-                    // Prioritize words that cover the most NEW letters
                     if (coverCount > maxNewCoverage) {
                         maxNewCoverage = coverCount;
                         bestWordObj = item;
                     }
                 }
 
-                // If we found a useful word, add it
                 if (bestWordObj) {
                     selectedClues.push(bestWordObj);
-                    // Remove covered letters from needed Set
-                    for (let char of bestWordObj.w) {
-                        neededChars.delete(char);
-                    }
+                    for (let char of bestWordObj.w) neededChars.delete(char);
                 } else {
-                    // Fallback: If dictionary doesn't have the letter (rare like Z or Q sometimes)
-                    // We just break to avoid infinite loop. 
-                    // (With current dictionary, coverage is 99.9% guaranteed)
                     break;
                 }
                 safetyCounter++;
             }
-
-            // 3. Ensure mapping covers these new words too
-            // The mapping generator needs to run AFTER we know all words (Quote + Clues)
-            // But currently we generate mapping strictly based on Quote.
-            // Actually, we just need to extend the mapping for letters in Clues that ARENT in Quote.
-            
             return selectedClues;
         }
 
         function extendMappingForClues(map, clueList) {
             const usedNumbers = new Set(Object.values(map));
-            
             clueList.forEach(clue => {
                 for (let char of clue.w) {
                     if (!map[char]) {
-                        // Assign a number if not already mapped
                         let num;
                         do {
                             num = Math.floor(Math.random() * 26) + 1;
@@ -593,7 +500,6 @@
         }
 
         function checkWin() {
-            // Only check boxes in the Quote Area to determine win
             const quoteInputs = quoteArea.querySelectorAll('input.letter-box');
             let isFull = true; 
             let isCorrect = true;
