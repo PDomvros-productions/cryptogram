@@ -12,8 +12,8 @@
             --text-color: #333;
             --success: #27ae60;
             /* Responsive sizes */
-            --input-size: 44px; /* Touch friendly default */
-            --input-font: 1.2rem;
+            --input-size: 40px; /* Slightly smaller to ensure fit */
+            --input-font: 1.1rem;
         }
 
         body {
@@ -21,7 +21,7 @@
             background-color: var(--bg);
             color: var(--text-color);
             margin: 0;
-            padding: 15px; /* Reduced padding for mobile */
+            padding: 15px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -33,15 +33,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             text-align: center;
         }
 
         h1 {
             color: var(--box-bg);
-            font-size: 1.5rem; /* Slightly smaller for mobile */
+            font-size: 1.6rem;
             margin: 0;
             line-height: 1.2;
+            font-weight: 700;
         }
 
         .title-logo {
@@ -60,19 +61,19 @@
             flex-direction: column;
             align-items: center;
             width: 100%;
-            max-width: 1000px;
+            max-width: 1200px; /* Wide max-width for laptops */
         }
 
-        /* --- Quote Section --- */
+        /* --- Quote Section (The Puzzle) --- */
         #quote-area {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 8px 12px; /* Row gap | Column gap */
-            margin-bottom: 25px;
+            gap: 10px 15px;
+            margin-bottom: 35px;
             width: 100%;
             background: white;
-            padding: 20px 10px;
+            padding: 25px 15px;
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             box-sizing: border-box;
@@ -80,54 +81,60 @@
 
         .word-group {
             display: flex;
-            flex-wrap: nowrap; /* Keep letters of a word together */
+            flex-wrap: wrap; /* Allow long words to wrap if screen is tiny */
+            justify-content: center;
             gap: 2px;
             margin-bottom: 5px;
         }
 
-        /* --- Clues Section --- */
+        /* --- Clues Section (The Helper Words) --- */
         #clues-area {
             display: grid;
-            /* Responsive Grid: Stacks on mobile, 2 columns on tablet, 3 on desktop */
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 12px;
+            /* Grid that fits as many 240px cards as possible */
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 15px;
             width: 100%;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
 
+        /* CARD STYLE: Vertical Stack to ensure text visibility */
         .clue-row {
             display: flex;
+            flex-direction: column; /* Stack vertically: Text top, inputs bottom */
             align-items: center;
-            justify-content: space-between;
+            text-align: center;
             background: white;
-            padding: 8px 12px;
+            padding: 12px;
             border-radius: 12px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid #e1e4e8;
         }
 
         .clue-info {
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
-            flex: 1;
-            padding-right: 5px;
-            min-width: 0; /* Prevents flex item from overflowing */
+            width: 100%;
+            margin-bottom: 10px; /* Space between text and boxes */
         }
 
-        .clue-icon { font-size: 1.3rem; flex-shrink: 0; }
+        .clue-icon { font-size: 1.4rem; }
+        
         .clue-text { 
             font-weight: 600; 
-            font-size: 0.9rem; 
-            color: #444; 
-            white-space: nowrap; 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
+            font-size: 0.95rem; 
+            color: #2c3e50; 
+            line-height: 1.3;
+            /* Ensure text wraps naturally */
+            white-space: normal; 
+            word-wrap: break-word;
         }
         
         .clue-inputs { 
             display: flex; 
-            gap: 2px; 
-            flex-shrink: 0; 
+            gap: 3px; 
+            justify-content: center;
         }
 
         /* --- Input Box Styling --- */
@@ -139,7 +146,7 @@
 
         input.letter-box {
             width: var(--input-size); 
-            height: calc(var(--input-size) * 1.2);
+            height: calc(var(--input-size) * 1.15);
             text-align: center; 
             font-size: var(--input-font); 
             font-weight: bold;
@@ -150,17 +157,18 @@
             color: var(--box-bg);
             padding: 0;
             margin: 0;
-            -webkit-appearance: none; /* Removes default iOS styles */
-            touch-action: manipulation; /* Improves touch response */
+            -webkit-appearance: none;
+            touch-action: manipulation;
+            transition: all 0.2s;
         }
         
         .punctuation-box {
              width: var(--input-size); 
-             height: calc(var(--input-size) * 1.2);
+             height: calc(var(--input-size) * 1.15);
              display: flex; 
              justify-content: center; 
              align-items: flex-end;
-             font-size: 1.5rem; 
+             font-size: 1.4rem; 
              font-weight: bold; 
              color: var(--box-bg);
              padding-bottom: 5px;
@@ -170,83 +178,80 @@
             outline: none; 
             border-color: var(--primary);
             background-color: white; 
-            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+            transform: translateY(-2px);
         }
 
         input.letter-box.highlight { background-color: #dbeafe; border-color: #93c5fd; }
         input.letter-box.correct { background-color: var(--primary); color: white; border-color: var(--primary); }
 
         .letter-number {
-            font-size: 0.65rem; 
+            font-size: 0.7rem; 
             font-weight: bold; 
             color: #7f8c8d; 
-            margin-top: 2px;
+            margin-top: 3px;
         }
 
         /* --- Footer --- */
         footer {
             margin-top: auto;
-            padding: 15px;
+            padding: 20px;
             text-align: center;
-            font-size: 0.8rem;
-            color: var(--box-bg);
+            font-size: 0.85rem;
+            color: #666;
             background: white;
             width: 100%;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-            border-radius: 15px 15px 0 0;
-            box-sizing: border-box;
+            border-top: 1px solid #eaeaea;
         }
 
         /* --- Modals --- */
         #win-modal {
             display: none; position: fixed; top: 50%; left: 50%;
             transform: translate(-50%, -50%); background: white;
-            padding: 25px; border-radius: 20px;
+            padding: 30px; border-radius: 20px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             text-align: center; z-index: 100;
             width: 90%;
-            max-width: 400px;
+            max-width: 450px;
         }
         
-        #win-modal h2 { margin: 0 0 10px 0; color: var(--success); }
-        #win-modal p { margin-bottom: 20px; color: #555; word-wrap: break-word; }
+        #win-modal h2 { margin: 0 0 15px 0; color: var(--success); font-size: 1.8rem; }
+        #win-modal p { margin-bottom: 25px; color: #555; font-size: 1.1rem; line-height: 1.4; }
         
         #next-btn {
             background: var(--primary); color: white; border: none;
-            padding: 14px 28px; border-radius: 30px; /* Larger hit area */
-            cursor: pointer; font-size: 1rem; font-weight: bold;
-            transition: background 0.2s;
+            padding: 15px 30px; border-radius: 30px;
+            cursor: pointer; font-size: 1.1rem; font-weight: bold;
+            transition: background 0.2s, transform 0.1s;
             width: 100%;
         }
-        #next-btn:hover { background: #357abd; }
+        #next-btn:hover { background: #357abd; transform: scale(1.02); }
 
         #overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 99;
+            background: rgba(0,0,0,0.6); z-index: 99;
+            backdrop-filter: blur(2px);
         }
 
         /* --- Mobile Specific Tweaks --- */
         @media (max-width: 600px) {
             :root {
-                /* Shrink inputs slightly on very small screens to fit words better */
-                --input-size: 32px; 
+                --input-size: 34px; 
                 --input-font: 1rem;
             }
             
             body { padding: 10px; }
-            h1 { font-size: 1.3rem; }
+            h1 { font-size: 1.4rem; }
             
-            #quote-area { padding: 15px 5px; gap: 6px 4px; }
+            #quote-area { padding: 15px 5px; gap: 8px 4px; }
             
-            /* Allow word groups to wrap internally if the single word is massive (rare) */
-            .word-group { flex-wrap: wrap; justify-content: center; }
-
-            /* Clues become more compact */
-            #clues-area { grid-template-columns: 1fr; gap: 10px; }
-            .clue-row { padding: 6px 10px; }
+            /* On mobile, keep stacking vertical, maybe 2 columns if screen allows, else 1 */
+            #clues-area { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
             
-            /* Hide non-essential clue info on tiny screens if needed */
+            /* Slightly more compact on mobile */
+            .clue-row { padding: 10px 5px; }
             .clue-text { font-size: 0.85rem; }
+            .clue-icon { font-size: 1.2rem; }
         }
     </style>
 </head>
@@ -281,34 +286,34 @@
         // ==========================================
         
         const quoteBank = [
-            "TO BE OR NOT TO BE THAT IS THE QUESTION", // 1. Shakespeare (Hamlet)
-            "I CAME I SAW I CONQUERED", // 2. Julius Caesar
-            "A TALE OF TWO CITIES", // 3. Dickens Title
-            "IT WAS THE BEST OF TIMES IT WAS THE WORST OF TIMES", // 4. Dickens (A Tale of Two Cities)
-            "ROMEO ROMEO WHEREFORE ART THOU ROMEO", // 5. Shakespeare (Romeo & Juliet)
-            "SHALL I COMPARE THEE TO A SUMMER'S DAY", // 6. Shakespeare (Sonnet 18)
-            "THE ONLY THING WE HAVE TO FEAR IS FEAR ITSELF", // 7. FDR
-            "ASK NOT WHAT YOUR COUNTRY CAN DO FOR YOU", // 8. JFK
-            "I HAVE A DREAM", // 9. MLK Jr.
-            "MAY THE FORCE BE WITH YOU", // 10. Star Wars
-            "THERE'S NO PLACE LIKE HOME", // 11. The Wizard of Oz
-            "FOUR SCORE AND SEVEN YEARS AGO", // 12. Lincoln (Gettysburg Address)
-            "THE UNEXAMINED LIFE IS NOT WORTH LIVING", // 13. Socrates
-            "I THINK THEREFORE I AM", // 14. Descartes
-            "KNOWLEDGE IS POWER", // 15. Francis Bacon
-            "YOU CAN'T HANDLE THE TRUTH", // 16. A Few Good Men
-            "THAT'S ONE SMALL STEP FOR MAN", // 17. Neil Armstrong
-            "CALL ME ISHMAEL", // 18. Melville (Moby Dick)
-            "ALL ANIMALS ARE EQUAL BUT SOME ARE MORE EQUAL THAN OTHERS", // 19. Orwell (Animal Farm)
-            "BIG BROTHER IS WATCHING YOU", // 20. Orwell (1984)
-            "IT IS A TRUTH UNIVERSALLY ACKNOWLEDGED", // 21. Austen (Pride and Prejudice)
-            "FRANKLY MY DEAR I DON'T GIVE A DAMN", // 22. Gone with the Wind
-            "HERE'S LOOKING AT YOU KID", // 23. Casablanca
-            "ELEMENTARY MY DEAR WATSON", // 24. Sherlock Holmes (attributed)
-            "A ROSE BY ANY OTHER NAME WOULD SMELL AS SWEET", // 25. Shakespeare (Romeo & Juliet)
-            "I SOLEMNLY SWEAR THAT I AM UP TO NO GOOD", // 26. Harry Potter
-            "COME WITH ME IF YOU WANT TO LIVE", // 27. Terminator
-            "SING MY ANGEL OF MUSIC" // 28. Phantom of the Opera
+            "TO BE OR NOT TO BE THAT IS THE QUESTION", 
+            "I CAME I SAW I CONQUERED", 
+            "A TALE OF TWO CITIES", 
+            "IT WAS THE BEST OF TIMES IT WAS THE WORST OF TIMES", 
+            "ROMEO ROMEO WHEREFORE ART THOU ROMEO", 
+            "SHALL I COMPARE THEE TO A SUMMER'S DAY", 
+            "THE ONLY THING WE HAVE TO FEAR IS FEAR ITSELF", 
+            "ASK NOT WHAT YOUR COUNTRY CAN DO FOR YOU", 
+            "I HAVE A DREAM", 
+            "MAY THE FORCE BE WITH YOU", 
+            "THERE'S NO PLACE LIKE HOME", 
+            "FOUR SCORE AND SEVEN YEARS AGO", 
+            "THE UNEXAMINED LIFE IS NOT WORTH LIVING", 
+            "I THINK THEREFORE I AM", 
+            "KNOWLEDGE IS POWER", 
+            "YOU CAN'T HANDLE THE TRUTH", 
+            "THAT'S ONE SMALL STEP FOR MAN", 
+            "CALL ME ISHMAEL", 
+            "ALL ANIMALS ARE EQUAL BUT SOME ARE MORE EQUAL THAN OTHERS", 
+            "BIG BROTHER IS WATCHING YOU", 
+            "IT IS A TRUTH UNIVERSALLY ACKNOWLEDGED", 
+            "FRANKLY MY DEAR I DON'T GIVE A DAMN", 
+            "HERE'S LOOKING AT YOU KID", 
+            "ELEMENTARY MY DEAR WATSON", 
+            "A ROSE BY ANY OTHER NAME WOULD SMELL AS SWEET", 
+            "I SOLEMNLY SWEAR THAT I AM UP TO NO GOOD", 
+            "COME WITH ME IF YOU WANT TO LIVE", 
+            "SING MY ANGEL OF MUSIC" 
         ];
 
         // The Master Dictionary of Clues (Mostly 5 letters)
