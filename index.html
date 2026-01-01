@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Literary & Movie Cryptograms</title>
     <style>
         :root {
@@ -11,6 +11,9 @@
             --box-bg: #2c3e50;
             --text-color: #333;
             --success: #27ae60;
+            /* Responsive sizes */
+            --input-size: 44px; /* Touch friendly default */
+            --input-font: 1.2rem;
         }
 
         body {
@@ -18,7 +21,7 @@
             background-color: var(--bg);
             color: var(--text-color);
             margin: 0;
-            padding: 20px;
+            padding: 15px; /* Reduced padding for mobile */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -30,22 +33,21 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            text-align: center;
         }
 
         h1 {
             color: var(--box-bg);
-            font-size: 1.8rem;
+            font-size: 1.5rem; /* Slightly smaller for mobile */
             margin: 0;
-            display: flex;
-            align-items: center;
-            text-align: center;
+            line-height: 1.2;
         }
 
         .title-logo {
-            height: 50px;
+            height: 40px;
             width: auto;
-            margin-right: 15px;
+            margin-right: 10px;
             vertical-align: middle;
         }
         
@@ -58,6 +60,7 @@
             flex-direction: column;
             align-items: center;
             width: 100%;
+            max-width: 1000px;
         }
 
         /* --- Quote Section --- */
@@ -65,28 +68,30 @@
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 12px;
-            margin-bottom: 30px;
-            max-width: 900px;
+            gap: 8px 12px; /* Row gap | Column gap */
+            margin-bottom: 25px;
+            width: 100%;
             background: white;
-            padding: 25px;
+            padding: 20px 10px;
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-sizing: border-box;
         }
 
         .word-group {
             display: flex;
-            gap: 3px;
-            margin-bottom: 10px;
+            flex-wrap: nowrap; /* Keep letters of a word together */
+            gap: 2px;
+            margin-bottom: 5px;
         }
 
         /* --- Clues Section --- */
         #clues-area {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 15px;
+            /* Responsive Grid: Stacks on mobile, 2 columns on tablet, 3 on desktop */
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
             width: 100%;
-            max-width: 1000px;
             margin-bottom: 30px;
         }
 
@@ -95,7 +100,7 @@
             align-items: center;
             justify-content: space-between;
             background: white;
-            padding: 10px 15px;
+            padding: 8px 12px;
             border-radius: 12px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
@@ -103,14 +108,27 @@
         .clue-info {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             flex: 1;
             padding-right: 5px;
+            min-width: 0; /* Prevents flex item from overflowing */
         }
 
-        .clue-icon { font-size: 1.5rem; }
-        .clue-text { font-weight: 600; font-size: 0.9rem; color: #444; }
-        .clue-inputs { display: flex; gap: 3px; }
+        .clue-icon { font-size: 1.3rem; flex-shrink: 0; }
+        .clue-text { 
+            font-weight: 600; 
+            font-size: 0.9rem; 
+            color: #444; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+        }
+        
+        .clue-inputs { 
+            display: flex; 
+            gap: 2px; 
+            flex-shrink: 0; 
+        }
 
         /* --- Input Box Styling --- */
         .letter-container {
@@ -120,66 +138,85 @@
         }
 
         input.letter-box {
-            width: 28px; height: 34px;
-            text-align: center; font-size: 1.1rem; font-weight: bold;
+            width: var(--input-size); 
+            height: calc(var(--input-size) * 1.2);
+            text-align: center; 
+            font-size: var(--input-font); 
+            font-weight: bold;
             text-transform: uppercase;
-            border: 2px solid #cbd5e0; border-radius: 5px;
-            background-color: #f8fafc; color: var(--box-bg);
-            transition: all 0.2s; padding: 0;
+            border: 2px solid #cbd5e0; 
+            border-radius: 6px;
+            background-color: #f8fafc; 
+            color: var(--box-bg);
+            padding: 0;
+            margin: 0;
+            -webkit-appearance: none; /* Removes default iOS styles */
+            touch-action: manipulation; /* Improves touch response */
         }
         
-        /* Specific style for spaces/punctuation in quotes */
         .punctuation-box {
-             width: 28px; height: 34px;
-             display: flex; justify-content: center; align-items: flex-end;
-             font-size: 1.5rem; font-weight: bold; color: var(--box-bg);
+             width: var(--input-size); 
+             height: calc(var(--input-size) * 1.2);
+             display: flex; 
+             justify-content: center; 
+             align-items: flex-end;
+             font-size: 1.5rem; 
+             font-weight: bold; 
+             color: var(--box-bg);
              padding-bottom: 5px;
         }
 
         input.letter-box:focus {
-            outline: none; border-color: var(--primary);
-            background-color: white; transform: translateY(-2px);
-            z-index: 10;
+            outline: none; 
+            border-color: var(--primary);
+            background-color: white; 
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
         }
 
         input.letter-box.highlight { background-color: #dbeafe; border-color: #93c5fd; }
         input.letter-box.correct { background-color: var(--primary); color: white; border-color: var(--primary); }
 
         .letter-number {
-            font-size: 0.6rem; font-weight: bold; color: #7f8c8d; margin-top: 2px;
+            font-size: 0.65rem; 
+            font-weight: bold; 
+            color: #7f8c8d; 
+            margin-top: 2px;
         }
 
         /* --- Footer --- */
         footer {
             margin-top: auto;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
-            font-weight: 600;
+            font-size: 0.8rem;
             color: var(--box-bg);
             background: white;
             width: 100%;
             box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
             border-radius: 15px 15px 0 0;
+            box-sizing: border-box;
         }
 
         /* --- Modals --- */
         #win-modal {
             display: none; position: fixed; top: 50%; left: 50%;
             transform: translate(-50%, -50%); background: white;
-            padding: 30px; border-radius: 20px;
+            padding: 25px; border-radius: 20px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             text-align: center; z-index: 100;
-            max-width: 90%;
+            width: 90%;
+            max-width: 400px;
         }
         
         #win-modal h2 { margin: 0 0 10px 0; color: var(--success); }
-        #win-modal p { margin-bottom: 20px; color: #555; }
+        #win-modal p { margin-bottom: 20px; color: #555; word-wrap: break-word; }
         
         #next-btn {
             background: var(--primary); color: white; border: none;
-            padding: 12px 24px; border-radius: 30px;
+            padding: 14px 28px; border-radius: 30px; /* Larger hit area */
             cursor: pointer; font-size: 1rem; font-weight: bold;
             transition: background 0.2s;
+            width: 100%;
         }
         #next-btn:hover { background: #357abd; }
 
@@ -188,6 +225,29 @@
             background: rgba(0,0,0,0.5); z-index: 99;
         }
 
+        /* --- Mobile Specific Tweaks --- */
+        @media (max-width: 600px) {
+            :root {
+                /* Shrink inputs slightly on very small screens to fit words better */
+                --input-size: 32px; 
+                --input-font: 1rem;
+            }
+            
+            body { padding: 10px; }
+            h1 { font-size: 1.3rem; }
+            
+            #quote-area { padding: 15px 5px; gap: 6px 4px; }
+            
+            /* Allow word groups to wrap internally if the single word is massive (rare) */
+            .word-group { flex-wrap: wrap; justify-content: center; }
+
+            /* Clues become more compact */
+            #clues-area { grid-template-columns: 1fr; gap: 10px; }
+            .clue-row { padding: 6px 10px; }
+            
+            /* Hide non-essential clue info on tiny screens if needed */
+            .clue-text { font-size: 0.85rem; }
+        }
     </style>
 </head>
 <body>
@@ -300,7 +360,6 @@
         let activeMapping = {};
         let availableQuotes = [];
 
-        // Generate Random Mapping (A=1, B=23, etc)
         function generateMapping(quoteText) {
             const map = {};
             const usedNumbers = new Set();
@@ -318,7 +377,6 @@
             return map;
         }
 
-        // SMART CLUE GENERATOR
         function generateSmartClues(quoteText) {
             let neededChars = new Set([...quoteText.toUpperCase().split('')].filter(c => c.match(/[A-Z]/)));
             let selectedClues = [];
@@ -392,6 +450,13 @@
                 input.maxLength = 1;
                 input.className = 'letter-box';
                 
+                // Mobile Optimization Attributes
+                input.setAttribute('autocomplete', 'off');
+                input.setAttribute('autocorrect', 'off');
+                input.setAttribute('autocapitalize', 'off');
+                input.setAttribute('spellcheck', 'false');
+                input.setAttribute('inputmode', 'text'); // Keeps generic text keyboard
+                
                 const num = activeMapping[upperChar];
                 const numberLabel = document.createElement('span');
                 numberLabel.className = 'letter-number';
@@ -403,9 +468,16 @@
                 input.addEventListener('input', (e) => handleInput(e, num));
                 input.addEventListener('focus', () => highlightGroup(num, true));
                 input.addEventListener('blur', () => highlightGroup(num, false));
+                
+                // Focus Management
                 input.addEventListener('keyup', (e) => {
-                     if(e.key.length === 1 && e.key.match(/[a-z]/i)) {
+                     // Move next only if character is entered
+                     if(e.key.length === 1 && e.key.match(/[a-z0-9]/i)) {
                          let next = container.nextElementSibling; 
+                         // Skip punctuation boxes to find next input
+                         while (next && !next.querySelector('input')) {
+                             next = next.nextElementSibling;
+                         }
                          if(next && next.querySelector('input')) {
                              next.querySelector('input').focus();
                          }
@@ -428,30 +500,22 @@
         }
 
         function loadRandomPuzzle() {
-            // UI Reset
             quoteArea.innerHTML = '';
             cluesArea.innerHTML = '';
             overlay.style.display = 'none';
             winModal.style.display = 'none';
 
-            // Pick Quote
             if (availableQuotes.length === 0) {
                 availableQuotes = [...quoteBank];
             }
             const randIndex = Math.floor(Math.random() * availableQuotes.length);
             currentQuote = availableQuotes[randIndex];
-            availableQuotes.splice(randIndex, 1); // Remove used
+            availableQuotes.splice(randIndex, 1); 
 
-            // 1. Generate Clues based on logic
             const generatedClues = generateSmartClues(currentQuote);
-
-            // 2. Generate Mapping for Quote
             activeMapping = generateMapping(currentQuote);
-            
-            // 3. Extend Mapping to cover letters in Clues that weren't in Quote
             activeMapping = extendMappingForClues(activeMapping, generatedClues);
 
-            // Render Quote
             const words = currentQuote.split(' ');
             words.forEach(word => {
                 const wordGroup = document.createElement('div');
@@ -463,7 +527,6 @@
                 quoteArea.appendChild(wordGroup);
             });
 
-            // Render Clues
             generatedClues.forEach(clue => {
                 const row = document.createElement('div');
                 row.className = 'clue-row';
@@ -487,6 +550,13 @@
 
         function handleInput(e, numberId) {
             const val = e.target.value.toUpperCase();
+            
+            // Allow only letters (remove this if you want to allow numbers, though answer key is alpha)
+            if(val && !val.match(/[A-Z]/)) {
+                e.target.value = "";
+                return;
+            }
+
             document.querySelectorAll(`input[data-number="${numberId}"]`).forEach(inp => {
                 inp.value = val;
             });
@@ -511,6 +581,9 @@
 
             if (isFull && isCorrect) {
                 document.querySelectorAll('input.letter-box').forEach(i => i.classList.add('correct'));
+                // Blur inputs to hide keyboard on mobile
+                if (document.activeElement) document.activeElement.blur();
+                
                 finalMsg.innerText = currentQuote;
                 setTimeout(() => {
                     overlay.style.display = 'block';
@@ -521,7 +594,6 @@
 
         document.getElementById('next-btn').addEventListener('click', loadRandomPuzzle);
 
-        // Init
         loadRandomPuzzle();
 
     </script>
